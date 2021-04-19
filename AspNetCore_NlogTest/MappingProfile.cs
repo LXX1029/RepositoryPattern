@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entities.DataTransferObjects;
 using Entities.Models;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,9 @@ namespace AspNetCore_NlogTest
         public MappingProfile()
         {
             CreateMap<Owner, OwnerDto>();
+            CreateMap<Account, AccountDto>();
+            CreateMap<OwnerForCreationDto, Owner>();
+            CreateMap<OwnerForUpdateDto, Owner>();
         }
     }
 }
