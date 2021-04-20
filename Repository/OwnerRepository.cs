@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Repository
@@ -57,6 +58,28 @@ namespace Repository
         public void DeleteOwner(Owner owner)
         {
             Delete(owner);
+        }
+
+        public PagedList<Owner> GetOwners(OwnerParameters ownerParameters)
+        {
+            //return FindAll()
+            //    .OrderBy(o => o.Name)
+            //    .Skip((ownerParameters.PageNumber - 1) * ownerParameters.PageSize)
+            //    .Take(ownerParameters.PageSize)
+            //    .ToList();
+            Expression<Func<Owner, bool>> expression = (m) => true;
+            if (ownerParameters.MinYearOfBirth != null)
+            {
+                expression = (m) => m.DateOfBirth.Year >= ownerParameters.MinYearOfBirth && m.DateOfBirth.Year <= ownerParameters.MaxYearOfBirth;
+            }
+            var owners = FindByCondition(expression);// .OrderBy(m => m.Name);
+            if (owners.Any() && !string.IsNullOrEmpty(ownerParameters.Name))
+            {
+                owners = owners.Where(m => m.Name.ToLower().Contains(ownerParameters.Name.Trim()));
+            }
+
+            return PagedList<Owner>.ToPagedList(owners.OrderBy(m => m.Name),
+                ownerParameters.PageNumber, ownerParameters.PageSize);
         }
     }
 }

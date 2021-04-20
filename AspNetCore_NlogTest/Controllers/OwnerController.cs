@@ -1,11 +1,13 @@
 ﻿using AspNetCore_NlogTest.Contracts;
 using AutoMapper;
 using Contracts;
+using Entities;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +36,7 @@ namespace AspNetCore_NlogTest.Controllers
             try
             {
                 var owners = this._repositoryWrapper.Owner.GetAllOwners();
-                this._loggerManager.LogInfo("加载 Owner数据");
+                this._loggerManager.LogInfo("返回所有 Owner数据");
                 var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
                 return Ok(ownersDto);
             }
@@ -44,6 +46,38 @@ namespace AspNetCore_NlogTest.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
             }
         }
+
+        [HttpGet]
+        public IActionResult GetOwners([FromBody] OwnerParameters ownerParameters)
+        {
+            if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
+            {
+                return BadRequest("最大年份应该大于最小年份");
+            }
+            try
+            {
+                var owners = this._repositoryWrapper.Owner.GetOwners(ownerParameters);
+                this._loggerManager.LogInfo("分页返回 Owner数据");
+                var metadata = new
+                {
+                    owners.TotalCount,
+                    owners.PageSize,
+                    owners.CurrentPage,
+                    owners.TotalPages,
+                    owners.HasNext,
+                    owners.HasPrevious
+                };
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+                var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
+                return Ok(ownersDto);
+            }
+            catch (Exception ex)
+            {
+                this._loggerManager.LogError(ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
+            }
+        }
+
         [HttpGet]
         public IActionResult GetOwnerById(Guid ownerId)
         {

@@ -3,6 +3,8 @@ using Contracts;
 using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Repository;
@@ -23,11 +25,12 @@ namespace AspNetCore_NlogTest.Extensions
         public static void ConfigureSqlserverContext(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration["SqlserverConnection:ConnectionStrings"];
-            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString, builder =>
+            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString, options =>
             {
-                builder.EnableRetryOnFailure();
-                builder.MigrationsAssembly("AspNetCore_NlogTest");
-            }));
+                options.EnableRetryOnFailure();
+                options.MigrationsAssembly("AspNetCore_NlogTest");
+               
+            }).ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>());
         }
 
 
