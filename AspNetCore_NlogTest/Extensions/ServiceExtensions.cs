@@ -24,12 +24,15 @@ namespace AspNetCore_NlogTest.Extensions
 
         public static void ConfigureSqlserverContext(this IServiceCollection services, IConfiguration configuration)
         {
-            var connectionString = configuration["SqlserverConnection:ConnectionStrings"];
+            //var connectionString = configuration["SqlserverConnection:ConnectionStrings"];
+            //var conn1 = configuration.GetValue<string>("ConnectionStrings:sqlConnection");
+            var connectionString = configuration.GetConnectionString("sqlConnection");
+
             services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString, options =>
             {
                 options.EnableRetryOnFailure();
                 options.MigrationsAssembly("AspNetCore_NlogTest");
-               
+
             }).ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>());
         }
 
