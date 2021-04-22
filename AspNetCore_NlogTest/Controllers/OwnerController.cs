@@ -2,11 +2,14 @@
 using AutoMapper;
 using Contracts;
 using Entities;
+using Entities.Configuration;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.OptionModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,13 +25,17 @@ namespace AspNetCore_NlogTest.Controllers
         private readonly ILoggerManager _loggerManager;
         private readonly IRepositoryWrapper _repositoryWrapper;
         private readonly IMapper _mapper;
+        private readonly IOptions<OwnerOptionModel> _options;
 
-        public OwnerController(ILogger<OwnerController> logger, ILoggerManager loggerManager, IRepositoryWrapper repositoryWrapper, IMapper mapper)
+        public OwnerController(ILogger<OwnerController> logger, ILoggerManager loggerManager, IRepositoryWrapper repositoryWrapper, IMapper mapper
+            , IOptionsSnapshot<OwnerOptionModel> options)
         {
             _logger = logger;
             this._loggerManager = loggerManager;
             this._repositoryWrapper = repositoryWrapper;
             this._mapper = mapper;
+            this._options = options;
+            var v = options.Value;
         }
         [HttpGet]
         public IActionResult GetAllOwners()
@@ -50,6 +57,7 @@ namespace AspNetCore_NlogTest.Controllers
         [HttpGet]
         public IActionResult GetOwners([FromBody] OwnerParameters ownerParameters)
         {
+            // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
             {
                 return BadRequest("最大年份应该大于最小年份");
@@ -69,7 +77,7 @@ namespace AspNetCore_NlogTest.Controllers
                 };
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
                 var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
-                return Ok(ownersDto);
+                return Ok(new { metadata = metadata, data = ownersDto });
             }
             catch (Exception ex)
             {

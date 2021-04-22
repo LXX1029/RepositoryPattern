@@ -13,6 +13,7 @@ using NLog;
 using System.IO;
 using AspNetCore_NlogTest.Extensions;
 using AspNetCore_NlogTest.Middleware;
+using Entities.OptionModels;
 
 namespace AspNetCore_NlogTest
 {
@@ -34,6 +35,8 @@ namespace AspNetCore_NlogTest
             services.ConfigureRepositoryWrapper();
             services.ConfigureCors();
             services.ConfigureIISIntegration();
+            services.AddOptions();
+            services.Configure<OwnerOptionModel>(Configuration.GetSection("OwnerConfiguration"));
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

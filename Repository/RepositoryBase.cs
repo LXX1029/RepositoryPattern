@@ -21,6 +21,7 @@ namespace Repository
         {
             var stateBeforeAdd = this.RepositoryContext.Entry(t).State;
             this.RepositoryContext.Set<T>().Add(t);
+            var afterAdd = this.RepositoryContext.Entry(t).State;
         }
 
         public void Delete(T t)
