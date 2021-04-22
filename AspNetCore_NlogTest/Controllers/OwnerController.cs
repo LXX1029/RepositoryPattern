@@ -38,24 +38,24 @@ namespace AspNetCore_NlogTest.Controllers
             var v = options.Value;
         }
         [HttpGet]
-        public IActionResult GetAllOwners()
+        public async Task<IActionResult> GetAllOwners()
         {
             try
             {
-                var owners = this._repositoryWrapper.Owner.GetAllOwners();
+                var owners = await this._repositoryWrapper.Owner.GetAllOwners();
                 this._loggerManager.LogInfo("返回所有 Owner数据");
                 var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
                 return Ok(ownersDto);
             }
             catch (Exception ex)
             {
-                this._loggerManager.LogError(ex.Message);
+                this._loggerManager.LogError($"发生错误：{ex}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
             }
         }
 
         [HttpGet]
-        public IActionResult GetOwners([FromBody] OwnerParameters ownerParameters)
+        public async Task<IActionResult> GetOwners([FromBody] OwnerParameters ownerParameters)
         {
             // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
@@ -87,11 +87,11 @@ namespace AspNetCore_NlogTest.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetOwnerById(Guid ownerId)
+        public async Task<IActionResult> GetOwnerById(Guid ownerId)
         {
             try
             {
-                var owner = this._repositoryWrapper.Owner.GetOwnerById(ownerId);
+                var owner = await this._repositoryWrapper.Owner.GetOwnerById(ownerId);
                 if (owner == null)
                 {
                     return NotFound();
@@ -109,11 +109,11 @@ namespace AspNetCore_NlogTest.Controllers
             }
         }
         [HttpGet("{ownerId}")]
-        public IActionResult GetOwnerWithDetails(Guid ownerId)
+        public async Task<IActionResult> GetOwnerWithDetails(Guid ownerId)
         {
             try
             {
-                var owner = this._repositoryWrapper.Owner.GetOwnerWithDetails(ownerId);
+                var owner = await this._repositoryWrapper.Owner.GetOwnerWithDetails(ownerId);
                 if (owner == null)
                 {
                     return NotFound();
@@ -132,7 +132,7 @@ namespace AspNetCore_NlogTest.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOwner([FromBody] OwnerForCreationDto owner)
+        public async Task<IActionResult> CreateOwner([FromBody] OwnerForCreationDto owner)
         {
             try
             {
@@ -155,7 +155,7 @@ namespace AspNetCore_NlogTest.Controllers
                 }
 
                 this._repositoryWrapper.Owner.CreateOwner(ownerEntity);
-                this._repositoryWrapper.Save();
+                await this._repositoryWrapper.SaveAsync();
                 var createdOwner = this._mapper.Map<OwnerDto>(ownerEntity);
                 // 创建成功，重新调用GetOwnerById或者返回 NoContent();
                 return CreatedAtAction("GetOwnerById", new { ownerId = createdOwner.OwnerId }, createdOwner);
@@ -170,7 +170,7 @@ namespace AspNetCore_NlogTest.Controllers
 
 
         [HttpPost]
-        public IActionResult UpdateOwner([FromBody] OwnerForUpdateDto owner)
+        public async Task<IActionResult> UpdateOwner([FromBody] OwnerForUpdateDto owner)
         {
             try
             {
@@ -184,7 +184,7 @@ namespace AspNetCore_NlogTest.Controllers
                     this._loggerManager.LogError("参数格式不正确");
                     return BadRequest("参数格式不正确");
                 }
-                var ownerEntity = this._repositoryWrapper.Owner.GetOwnerById(owner.OwnerId);
+                var ownerEntity = await this._repositoryWrapper.Owner.GetOwnerById(owner.OwnerId);
                 if (ownerEntity == null)
                 {
                     this._loggerManager.LogDebug($"不存在Id为：{owner.OwnerId}的对象");
@@ -198,7 +198,7 @@ namespace AspNetCore_NlogTest.Controllers
                 }
                 this._mapper.Map(owner, ownerEntity);
                 this._repositoryWrapper.Owner.UpdateOwner(ownerEntity);
-                this._repositoryWrapper.Save();
+                await this._repositoryWrapper.SaveAsync();
                 return RedirectToAction("GetAllOwners");
                 //return NoContent();
 
@@ -210,7 +210,7 @@ namespace AspNetCore_NlogTest.Controllers
             }
         }
         [HttpDelete]
-        public IActionResult DeleteOwner(Guid id)
+        public async Task<IActionResult> DeleteOwner(Guid id)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace AspNetCore_NlogTest.Controllers
                     _loggerManager.LogError("传入参数不合法");
                     return Content("传入参数不合法");
                 }
-                var _owner = this._repositoryWrapper.Owner.GetOwnerById(id);
+                var _owner = await this._repositoryWrapper.Owner.GetOwnerById(id);
                 if (_owner == null)
                 {
                     return NotFound();
@@ -230,7 +230,7 @@ namespace AspNetCore_NlogTest.Controllers
                     return BadRequest("该owner 下存在 account 信息，请先删除 account!");
                 }
                 this._repositoryWrapper.Owner.DeleteOwner(_owner);
-                this._repositoryWrapper.Save();
+                await this._repositoryWrapper.SaveAsync();
                 return Content("删除成功");
             }
             catch (Exception ex)

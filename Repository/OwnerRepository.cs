@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -30,24 +31,28 @@ namespace Repository
             Update(owner);
         }
 
-        public IEnumerable<Owner> GetAllOwners()
+        public async Task<IEnumerable<Owner>> GetAllOwners()
         {
-            return FindAll()
+            return await FindAll()
                     .Include(i => i.Accounts)
                     .OrderBy(o => o.Name)
-                    .ToList();
+                    .ToListAsync();
         }
 
-        public Owner GetOwnerById(Guid ownerId)
+        public Task<Owner> GetOwnerById(Guid ownerId)
         {
-            return FindByCondition(o => o.OwnerId.Equals(ownerId)).FirstOrDefault();
+            //return FindByCondition(o => o.OwnerId.Equals(ownerId)).FirstOrDefault();
+            return FindByCondition(o => o.OwnerId.Equals(ownerId)).FirstOrDefaultAsync();
         }
 
-        public Owner GetOwnerWithDetails(Guid ownerId)
+        public Task<Owner> GetOwnerWithDetails(Guid ownerId)
         {
+            //return FindByCondition(o => o.OwnerId.Equals(ownerId))
+            //    .Include(ac => ac.Accounts)
+            //    .FirstOrDefault();
             return FindByCondition(o => o.OwnerId.Equals(ownerId))
                 .Include(ac => ac.Accounts)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
         public bool IsExistOwnerName(Owner owner)
@@ -60,7 +65,7 @@ namespace Repository
             Delete(owner);
         }
 
-        public PagedList<Owner> GetOwners(OwnerParameters ownerParameters)
+        public async Task<PagedList<Owner>> GetOwners(OwnerParameters ownerParameters)
         {
             //return FindAll()
             //    .OrderBy(o => o.Name)
@@ -72,13 +77,13 @@ namespace Repository
             {
                 expression = (m) => m.DateOfBirth.Year >= ownerParameters.MinYearOfBirth && m.DateOfBirth.Year <= ownerParameters.MaxYearOfBirth;
             }
-            var owners = FindByCondition(expression);// .OrderBy(m => m.Name);
+            var owners = await FindByCondition(expression).ToListAsync();// .OrderBy(m => m.Name);
             if (owners.Any() && !string.IsNullOrEmpty(ownerParameters.Name))
             {
-                owners = owners.Where(m => m.Name.ToLower().Contains(ownerParameters.Name.Trim()));
+                owners = owners.Where(m => m.Name.ToLower().Contains(ownerParameters.Name.Trim())).ToList();
             }
 
-            return PagedList<Owner>.ToPagedList(owners.OrderBy(m => m.Name),
+            return PagedList<Owner>.ToPagedList(owners.OrderBy(m => m.Name).AsQueryable(),
                 ownerParameters.PageNumber, ownerParameters.PageSize);
         }
     }
