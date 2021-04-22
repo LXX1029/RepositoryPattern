@@ -14,6 +14,7 @@ using System.IO;
 using AspNetCore_NlogTest.Extensions;
 using AspNetCore_NlogTest.Middleware;
 using Entities.OptionModels;
+using AspNetCore_NlogTest.Contracts;
 
 namespace AspNetCore_NlogTest
 {
@@ -43,13 +44,14 @@ namespace AspNetCore_NlogTest
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerManager logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMiddleware<ExceptionHandleMiddleware>();
+            app.ConfigureExceptionHandler(logger);
+            //app.UseMiddleware<ExceptionHandleMiddleware>();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");
             app.UseRouting();

@@ -57,6 +57,8 @@ namespace AspNetCore_NlogTest.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOwners([FromBody] OwnerParameters ownerParameters)
         {
+
+            throw new Exception("模拟异常");
             // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
             {
@@ -64,7 +66,7 @@ namespace AspNetCore_NlogTest.Controllers
             }
             try
             {
-                var owners = this._repositoryWrapper.Owner.GetOwners(ownerParameters);
+                var owners = await this._repositoryWrapper.Owner.GetOwners(ownerParameters);
                 this._loggerManager.LogInfo("分页返回 Owner数据");
                 var metadata = new
                 {
