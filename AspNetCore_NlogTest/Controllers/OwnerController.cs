@@ -58,7 +58,7 @@ namespace AspNetCore_NlogTest.Controllers
         public async Task<IActionResult> GetOwners([FromBody] OwnerParameters ownerParameters)
         {
 
-            throw new Exception("模拟异常");
+            //throw new Exception("模拟异常");
             // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
             {
