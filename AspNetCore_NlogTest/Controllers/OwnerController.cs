@@ -38,208 +38,162 @@ namespace AspNetCore_NlogTest.Controllers
             var v = options.Value;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllOwners()
+        public async Task<ResponseDetails> GetAllOwners()
         {
-            try
+            var owners = await this._repositoryWrapper.Owner.GetAllOwners();
+            this._loggerManager.LogInfo("返回所有 Owner数据");
+            var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
+            return new ResponseDetails
             {
-                var owners = await this._repositoryWrapper.Owner.GetAllOwners();
-                this._loggerManager.LogInfo("返回所有 Owner数据");
-                var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
-                return Ok(ownersDto);
-            }
-            catch (Exception ex)
-            {
-                this._loggerManager.LogError($"发生错误：{ex}");
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
-            }
+                Message = SUCCESS,
+                Data = ownersDto
+            };
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOwners([FromBody] OwnerParameters ownerParameters)
+        public async Task<ResponseDetails> GetOwners([FromBody] OwnerParameters ownerParameters)
         {
+            if (ownerParameters == null)
+                return new ResponseDetails
+                {
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Message = PARAM_NULL_ERROR
+                };
 
-            //throw new Exception("模拟异常");
             // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
             {
-                return BadRequest("最大年份应该大于最小年份");
-            }
-            try
-            {
-                var owners = await this._repositoryWrapper.Owner.GetOwners(ownerParameters);
-                this._loggerManager.LogInfo("分页返回 Owner数据");
-                var metadata = new
+                return new ResponseDetails
                 {
-                    owners.TotalCount,
-                    owners.PageSize,
-                    owners.CurrentPage,
-                    owners.TotalPages,
-                    owners.HasNext,
-                    owners.HasPrevious
+                    Code = (int)HttpStatusCode.BadRequest,
+                    Message = INNTER_SERVER_ERROR
                 };
-                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-                var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
-                return Ok(new { metadata = metadata, data = ownersDto });
             }
-            catch (Exception ex)
+            var owners = await this._repositoryWrapper.Owner.GetOwners(ownerParameters);
+            this._loggerManager.LogInfo("分页返回 Owner数据");
+            var pagination = new
             {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
-            }
+                owners.TotalCount,
+                owners.PageSize,
+                owners.CurrentPage,
+                owners.TotalPages,
+                owners.HasNext,
+                owners.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pagination));
+            var ownersDto = _mapper.Map<IEnumerable<OwnerDto>>(owners);
+            return new ResponseDetails { Code = (int)HttpStatusCode.OK, Data = ownersDto, Pagination = pagination };
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOwnerById(Guid ownerId)
+        public async Task<ResponseDetails> GetOwnerById(Guid ownerId)
         {
-            try
+            var owner = await this._repositoryWrapper.Owner.GetOwnerById(ownerId);
+            if (owner == null)
             {
-                var owner = await this._repositoryWrapper.Owner.GetOwnerById(ownerId);
-                if (owner == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    var ownerDto = this._mapper.Map<OwnerDto>(owner);
-                    return Ok(ownerDto);
-                }
+                return new ResponseDetails { Code = (int)HttpStatusCode.NotFound, Message = NOT_FOND };
             }
-            catch (Exception ex)
+            else
             {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
+                var ownerDto = this._mapper.Map<OwnerDto>(owner);
+                return new ResponseDetails { Data = ownerDto, Message = SUCCESS };
             }
         }
         [HttpGet("{ownerId}")]
-        public async Task<IActionResult> GetOwnerWithDetails(Guid ownerId)
+        public async Task<ResponseDetails> GetOwnerWithDetails(Guid ownerId)
         {
-            try
+            var owner = await this._repositoryWrapper.Owner.GetOwnerWithDetails(ownerId);
+            if (owner == null)
             {
-                var owner = await this._repositoryWrapper.Owner.GetOwnerWithDetails(ownerId);
-                if (owner == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    var ownerDto = this._mapper.Map<OwnerDto>(owner);
-                    return Ok(ownerDto);
-                }
+                return new ResponseDetails { Code = (int)HttpStatusCode.NotFound, Message = NOT_FOND };
             }
-            catch (Exception ex)
+            else
             {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
+                var ownerDto = this._mapper.Map<OwnerDto>(owner);
+                return new ResponseDetails { Data = ownerDto, Message = SUCCESS };
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOwner([FromBody] OwnerForCreationDto owner)
+        public async Task<ResponseDetails> CreateOwner([FromBody] OwnerForCreationDto owner)
         {
-            try
+            if (owner == null)
             {
-                if (owner == null)
-                {
-                    _loggerManager.LogError("参数为空");
-                    return BadRequest("owner 对象为空");
-                }
-                if (!ModelState.IsValid)
-                {
-                    this._loggerManager.LogError("参数格式不正确");
-                    return BadRequest("参数格式不正确");
-                }
-                var ownerEntity = this._mapper.Map<Owner>(owner);
-                var _isExist = this._repositoryWrapper.Owner.IsExistOwnerName(ownerEntity);
-                if (_isExist)
-                {
-                    Response.Headers.Add("error", "xxxx");
-                    return StatusCode(1, "该名称已存在");
-                }
-
-                this._repositoryWrapper.Owner.CreateOwner(ownerEntity);
-                await this._repositoryWrapper.SaveAsync();
-                var createdOwner = this._mapper.Map<OwnerDto>(ownerEntity);
-                // 创建成功，重新调用GetOwnerById或者返回 NoContent();
-                return CreatedAtAction("GetOwnerById", new { ownerId = createdOwner.OwnerId }, createdOwner);
-
+                _loggerManager.LogError("参数为空");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
             }
-            catch (Exception ex)
+            if (!ModelState.IsValid)
             {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
+                this._loggerManager.LogError("参数格式不正确");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
             }
+            var ownerEntity = this._mapper.Map<Owner>(owner);
+            var _isExist = this._repositoryWrapper.Owner.IsExistOwnerName(ownerEntity);
+            if (_isExist)
+            {
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = "该名称已存在" };
+            }
+            this._repositoryWrapper.Owner.CreateOwner(ownerEntity);
+            await this._repositoryWrapper.SaveAsync();
+            var createdOwner = this._mapper.Map<OwnerDto>(ownerEntity);
+            return new ResponseDetails { Code = (int)HttpStatusCode.Created, Data = createdOwner, Message = SUCCESS };
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> UpdateOwner([FromBody] OwnerForUpdateDto owner)
+        public async Task<ResponseDetails> UpdateOwner([FromBody] OwnerForUpdateDto owner)
         {
-            try
+            if (owner == null)
             {
-                if (owner == null)
-                {
-                    _loggerManager.LogError("参数为空");
-                    return BadRequest("owner 对象为空");
-                }
-                if (!ModelState.IsValid)
-                {
-                    this._loggerManager.LogError("参数格式不正确");
-                    return BadRequest("参数格式不正确");
-                }
-                var ownerEntity = await this._repositoryWrapper.Owner.GetOwnerById(owner.OwnerId);
-                if (ownerEntity == null)
-                {
-                    this._loggerManager.LogDebug($"不存在Id为：{owner.OwnerId}的对象");
-                    return NotFound($"不存在Id为：{owner.OwnerId}的对象");
-                }
-                var _isExist = this._repositoryWrapper.Owner.IsExistOwnerName(ownerEntity);
-                if (_isExist)
-                {
-                    Response.Headers.Add("error", "xxxx");
-                    return StatusCode(1, "该名称已存在");
-                }
-                this._mapper.Map(owner, ownerEntity);
-                this._repositoryWrapper.Owner.UpdateOwner(ownerEntity);
-                await this._repositoryWrapper.SaveAsync();
-                return RedirectToAction("GetAllOwners");
-                //return NoContent();
+                _loggerManager.LogError("参数为空");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
+            }
+            if (!ModelState.IsValid)
+            {
+                this._loggerManager.LogError("参数格式不正确");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
+            }
+            var ownerEntity = await this._repositoryWrapper.Owner.GetOwnerById(owner.OwnerId);
+            if (ownerEntity == null)
+            {
+                this._loggerManager.LogDebug($"不存在Id为：{owner.OwnerId}的对象");
+                return new ResponseDetails { Code = (int)HttpStatusCode.NotFound, Message = $"不存在Id为：{owner.OwnerId}的对象" };
+            }
+            var _isExist = this._repositoryWrapper.Owner.IsExistOwnerName(ownerEntity);
+            if (_isExist)
+            {
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = "该名称已存在" };
+            }
+            this._mapper.Map(owner, ownerEntity);
+            this._repositoryWrapper.Owner.UpdateOwner(ownerEntity);
+            await this._repositoryWrapper.SaveAsync();
+            var updatedOwner = this._mapper.Map<OwnerDto>(ownerEntity);
+            return new ResponseDetails { Data = updatedOwner, Message = SUCCESS };
 
-            }
-            catch (Exception ex)
-            {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
-            }
+
         }
         [HttpDelete]
-        public async Task<IActionResult> DeleteOwner(Guid id)
+        public async Task<ResponseDetails> DeleteOwner(Guid id)
         {
-            try
+            if (!Guid.TryParse(id.ToString(), out Guid result))
             {
-                if (!Guid.TryParse(id.ToString(), out Guid result))
-                {
-                    _loggerManager.LogError("传入参数不合法");
-                    return Content("传入参数不合法");
-                }
-                var _owner = await this._repositoryWrapper.Owner.GetOwnerById(id);
-                if (_owner == null)
-                {
-                    return NotFound();
-                }
-                if (this._repositoryWrapper.Account.AccountsByOwner(id).Any())
-                {
-                    _loggerManager.LogError("该owner 下存在 account 信息，请先删除 account!");
-                    return BadRequest("该owner 下存在 account 信息，请先删除 account!");
-                }
-                this._repositoryWrapper.Owner.DeleteOwner(_owner);
-                await this._repositoryWrapper.SaveAsync();
-                return Content("删除成功");
+                _loggerManager.LogError("传入参数不合法");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
             }
-            catch (Exception ex)
+            var owner = await this._repositoryWrapper.Owner.GetOwnerById(id);
+            if (owner == null)
             {
-                this._loggerManager.LogError(ex.Message);
-                return StatusCode((int)HttpStatusCode.InternalServerError, INNTER_SERVER_ERROR);
+                return new ResponseDetails { Code = (int)HttpStatusCode.NotFound, Message = $"不存在Id为：{owner.OwnerId}的对象" };
             }
+            if (this._repositoryWrapper.Account.AccountsByOwner(id).Any())
+            {
+                _loggerManager.LogError("该owner 下存在 account 信息，请先删除 account!");
+                return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = "该owner 下存在 account 信息，请先删除 account!" };
+            }
+            this._repositoryWrapper.Owner.DeleteOwner(owner);
+            await this._repositoryWrapper.SaveAsync();
+            return new ResponseDetails { Message = SUCCESS };
+
         }
     }
 }

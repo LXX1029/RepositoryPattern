@@ -80,7 +80,7 @@ namespace Repository
             var owners = await FindByCondition(expression).ToListAsync();// .OrderBy(m => m.Name);
             if (owners.Any() && !string.IsNullOrEmpty(ownerParameters.Name))
             {
-                owners = owners.Where(m => m.Name.ToLower().Contains(ownerParameters.Name.Trim())).ToList();
+                owners = owners.Where(m => m.Name.ToLower().Contains(ownerParameters.Name.ToLower().Trim())).ToList();
             }
 
             return PagedList<Owner>.ToPagedList(owners.OrderBy(m => m.Name).AsQueryable(),

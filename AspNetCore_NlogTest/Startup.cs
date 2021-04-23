@@ -50,8 +50,9 @@ namespace AspNetCore_NlogTest
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.ConfigureExceptionHandler(logger);
-            //app.UseMiddleware<ExceptionHandleMiddleware>();
+            //app.ConfigureExceptionHandler(logger);
+            // 使用自定义中间件
+            app.ConfigureCustomExceptionMiddleware();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");
             app.UseRouting();

@@ -1,4 +1,5 @@
 ﻿using AspNetCore_NlogTest.Contracts;
+using Entities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace AspNetCore_NlogTest.Middleware
 {
+    /// <summary>
+    /// 自定义异常处理中间件
+    /// </summary>
     public class ExceptionHandleMiddleware
     {
         private readonly RequestDelegate _next;
@@ -29,11 +33,15 @@ namespace AspNetCore_NlogTest.Middleware
                 context.Response.ContentType = "application/json";
                 //context.Response.ContentType = "text/plain";
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                _loggerManager.LogError(ex.Message);
+                _loggerManager.LogError($"Internal Server Error：{ex}");
                 //_loggerManager.LogInfo(ex.Message);
                 //_loggerManager.LogDebug(ex.Message);
                 //_loggerManager.LogWarn(ex.Message);
-                await context.Response.WriteAsync(ex.Message);
+                await context.Response.WriteAsync(new ResponseDetails
+                {
+                    Code = context.Response.StatusCode,
+                    Message = "Internal Server Error"
+                }.ToString());
             }
         }
     }
