@@ -15,6 +15,8 @@ using AspNetCore_NlogTest.Extensions;
 using AspNetCore_NlogTest.Middleware;
 using Entities.OptionModels;
 using AspNetCore_NlogTest.Contracts;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace AspNetCore_NlogTest
 {
@@ -50,10 +52,17 @@ namespace AspNetCore_NlogTest
             {
                 app.UseDeveloperExceptionPage();
             }
+            var provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".pdf"] = "application/pdf";
+
             //app.ConfigureExceptionHandler(logger);
             // 使用自定义中间件
             app.ConfigureCustomExceptionMiddleware();
             app.UseStaticFiles();
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    ContentTypeProvider = provider
+            //});
             app.UseCors("CorsPolicy");
             app.UseRouting();
 
@@ -61,6 +70,12 @@ namespace AspNetCore_NlogTest
 
             app.UseEndpoints(endpoints =>
             {
+
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("12321");
+                });
+
                 endpoints.MapControllers();
             });
         }

@@ -3,6 +3,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AspNetCore_NlogTest
@@ -19,6 +20,15 @@ namespace AspNetCore_NlogTest
         public void LogError(string message)
         {
             _logger.Error(message);
+        }
+
+        public void LogError(Exception exception)
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine($"Message:{exception.Message}");
+            builder.AppendLine($"StackTrace:{exception.Message}");
+            _logger.Error(exception);
+
         }
 
         public void LogInfo(string message)

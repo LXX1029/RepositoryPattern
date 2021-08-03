@@ -11,9 +11,10 @@ namespace AspNetCore_NlogTest.Controllers
     public class BaseController : ControllerBase
     {
         protected readonly string SUCCESS = "操作成功";
+        protected readonly string FAIL = "操作失败";
         protected readonly string NOT_FOND = "未查询到对象";
         protected readonly string INNTER_SERVER_ERROR = "服务内部错误";
         protected readonly string PARAM_NULL_ERROR = "参数为空";
-        protected readonly string PARAM_FORMAT_ERROR = "参数为空";
+        protected readonly string PARAM_FORMAT_ERROR = "参数格式不正确";
     }
 }
