@@ -91,6 +91,7 @@ namespace Repository
 
         public async Task<bool> UpLoadFile(IFormFile file)
         {
+
             var fileName = string.Empty;
             var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
             fileName = DateTime.Now.Ticks + extension;
