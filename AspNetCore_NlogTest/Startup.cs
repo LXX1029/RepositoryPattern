@@ -1,20 +1,15 @@
+using AspNetCore_NlogTest.Contracts;
+using AspNetCore_NlogTest.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NLog;
+using Services;
+using Services.Abstractions;
 using System.IO;
-using AspNetCore_NlogTest.Extensions;
-using AspNetCore_NlogTest.Middleware;
-using Entities.OptionModels;
-using AspNetCore_NlogTest.Contracts;
 
 namespace AspNetCore_NlogTest
 {
@@ -32,12 +27,13 @@ namespace AspNetCore_NlogTest
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureLoggerService();
-            services.ConfigureSqlserverContext(Configuration);
+            //services.ConfigureSqlserverContext(Configuration);
+            services.ConfigureSqliteContext(Configuration);
+
             services.ConfigureRepositoryWrapper();
             services.ConfigureCors();
             services.ConfigureIISIntegration();
             services.AddOptions();
-            services.Configure<OwnerOptionModel>(Configuration.GetSection("OwnerConfiguration"));
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers()
                 .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -52,7 +48,7 @@ namespace AspNetCore_NlogTest
             }
             //app.ConfigureExceptionHandler(logger);
             // 使用自定义中间件
-            app.ConfigureCustomExceptionMiddleware();
+           app.ConfigureCustomExceptionMiddleware();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");
             app.UseRouting();
@@ -62,6 +58,10 @@ namespace AspNetCore_NlogTest
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.Map("/", async context =>
+                {
+                    await context.Response.WriteAsync($"Worker Process Name : {System.Diagnostics.Process.GetCurrentProcess().ProcessName}");
+                });
             });
         }
     }

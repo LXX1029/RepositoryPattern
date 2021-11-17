@@ -1,10 +1,6 @@
 ﻿using AutoMapper;
-using Entities.DataTransferObjects;
-using Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Contracts5Dot0;
+using Domain.Entities;
 
 namespace AspNetCore_NlogTest
 {

@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Models.QueryModel
+{
+    public class OwnerParameters : QueryStringParameters
+    {
+        public int? MinYearOfBirth { get; set; }
+        public int? MaxYearOfBirth { get; set; } = DateTime.Now.Year;
+        public bool ValidYearRang => MaxYearOfBirth > MinYearOfBirth;
+
+        public string Name { get; set; }
+
+    }
+}

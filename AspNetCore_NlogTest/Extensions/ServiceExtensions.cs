@@ -1,17 +1,13 @@
 ﻿using AspNetCore_NlogTest.Contracts;
-using Contracts;
-using Entities;
+using Domain.IRepositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Persistence5Dot0;
+using Persistence5Dot0.Repositories;
+using Services;
+using Services.Abstractions;
 
 namespace AspNetCore_NlogTest.Extensions
 {
@@ -24,16 +20,26 @@ namespace AspNetCore_NlogTest.Extensions
 
         public static void ConfigureSqlserverContext(this IServiceCollection services, IConfiguration configuration)
         {
-            //var connectionString = configuration["SqlserverConnection:ConnectionStrings"];
-            //var conn1 = configuration.GetValue<string>("ConnectionStrings:sqlConnection");
-            var connectionString = configuration.GetConnectionString("sqlConnection");
+            //var connectionString = configuration.GetConnectionString("sqlConnection");
+            //services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString, options =>
+            //{
+            //    options.EnableRetryOnFailure();
+            //    options.MigrationsAssembly("AspNetCore_NlogTest");
 
-            services.AddDbContext<RepositoryContext>(options => options.UseSqlServer(connectionString, options =>
+            //}).ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>());
+        }
+
+        public static void ConfigureSqliteContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("sqliteConnection");
+            services.AddDbContextPool<RepositoryContext>(options =>
+            options.EnableSensitiveDataLogging()
+            .UseSqlite(connectionString, options =>
             {
-                options.EnableRetryOnFailure();
-                options.MigrationsAssembly("AspNetCore_NlogTest");
 
-            }).ReplaceService<IQueryTranslationPostprocessorFactory, SqlServer2008QueryTranslationPostprocessorFactory>());
+                options.MigrationsAssembly("Persistence5Dot0");
+            }));
+            ;
         }
 
 
@@ -52,6 +58,11 @@ namespace AspNetCore_NlogTest.Extensions
             });
         }
 
-        public static void ConfigureRepositoryWrapper(this IServiceCollection services) => services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        public static void ConfigureRepositoryWrapper(this IServiceCollection services)
+        {
+            services.AddScoped<IServiceManager, ServiceManager>();
+            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+        }
+
     }
 }

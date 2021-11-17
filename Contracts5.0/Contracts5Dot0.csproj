@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Contracts5Dot0</RootNamespace>
+    <AssemblyName>Contracts5Dot0</AssemblyName>
+  </PropertyGroup>
+
+</Project>

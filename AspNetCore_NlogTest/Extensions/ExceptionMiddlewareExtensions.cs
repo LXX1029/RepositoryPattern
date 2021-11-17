@@ -1,14 +1,10 @@
 ﻿using AspNetCore_NlogTest.Contracts;
 using AspNetCore_NlogTest.Middleware;
-using Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Models;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace AspNetCore_NlogTest.Extensions
 {
@@ -39,7 +35,7 @@ namespace AspNetCore_NlogTest.Extensions
                         //}.ToString());
                         await context.Response.WriteAsync(new ResponseDetails
                         {
-                            Code = context.Response.StatusCode,
+                            Code = (HttpStatusCode)context.Response.StatusCode,
                             Message = "Internal Server Error"
                         }.ToString());
                     }
