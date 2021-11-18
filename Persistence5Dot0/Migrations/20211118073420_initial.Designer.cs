@@ -9,7 +9,7 @@ using Persistence5Dot0;
 namespace Persistence5Dot0.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20211117053943_initial")]
+    [Migration("20211118073420_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,30 +43,30 @@ namespace Persistence5Dot0.Migrations
                     b.HasData(
                         new
                         {
-                            AccountId = new Guid("d7ddc108-6b05-4a59-b1c2-7a7b5bc8c1cb"),
+                            AccountId = new Guid("cea2d9ce-d815-44fe-9763-98634bdd1388"),
                             AccountType = "网易",
-                            DateCreated = new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(3446),
+                            DateCreated = new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4031),
                             OwnerId = new Guid("efd9b8e4-b759-434d-bda1-21d268531fb3")
                         },
                         new
                         {
-                            AccountId = new Guid("92352da2-6f82-4ae3-80b5-596b80d70b91"),
+                            AccountId = new Guid("4c605048-2faf-4cad-99e2-715201ee8b33"),
                             AccountType = "腾讯",
-                            DateCreated = new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5785),
-                            OwnerId = new Guid("be24d142-c750-4cee-90eb-2b99d942b33c")
+                            DateCreated = new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4867),
+                            OwnerId = new Guid("efd9b8e4-b759-434d-bda1-21d268531fb3")
                         },
                         new
                         {
-                            AccountId = new Guid("89676aed-dcf6-4b99-a3fc-b2c3134945f3"),
+                            AccountId = new Guid("bdeba495-e02a-416f-a462-126b353ec8b6"),
                             AccountType = "京东",
-                            DateCreated = new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5848),
+                            DateCreated = new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4880),
                             OwnerId = new Guid("e8253d32-603a-45c3-8d7b-48b2971b20e5")
                         },
                         new
                         {
-                            AccountId = new Guid("44e257ca-d7a9-426b-a4eb-9d124cf45941"),
+                            AccountId = new Guid("dbfa3622-8150-4730-b4e9-321cfa4d79c7"),
                             AccountType = "CSDN",
-                            DateCreated = new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5853),
+                            DateCreated = new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4886),
                             OwnerId = new Guid("54aeb677-a1fc-479f-b095-98476a027e6d")
                         });
                 });
@@ -127,13 +127,11 @@ namespace Persistence5Dot0.Migrations
 
             modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.HasOne("Domain.Entities.Owner", "Owner")
+                    b.HasOne("Domain.Entities.Owner", null)
                         .WithMany("Accounts")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Domain.Entities.Owner", b =>

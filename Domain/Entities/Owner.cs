@@ -9,6 +9,7 @@ namespace Domain.Entities
     [Table("Owner")]
     public class Owner
     {
+        [Key]
         public Guid OwnerId { get; set; }
 
         [Required(ErrorMessage = "Name 不能为空")]

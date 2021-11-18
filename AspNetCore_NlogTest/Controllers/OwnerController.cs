@@ -70,7 +70,7 @@ namespace AspNetCore_NlogTest.Controllers
                 return ResponseSuccessWithData(owner);
             }
         }
-        [HttpGet("{ownerId}")]
+        [HttpGet]
         public async Task<ResponseDetails> GetOwnerWithDetails(Guid ownerId)
         {
             var owner = await this._serviceManager.OwnerService.GetOwnerWithDetails(ownerId);

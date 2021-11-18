@@ -12,7 +12,7 @@ namespace Services.Abstractions
     {
         Task<PagedList<OwnerDto>> GetOwners(OwnerParameters ownerParameters);
         Task<OwnerDto> GetOwnerById(Guid ownerId);
-        Task<OwnerDto> GetOwnerWithDetails(Guid ownerId);
+        Task<OwnerWithAccountDto> GetOwnerWithDetails(Guid ownerId);
         Task<bool> IsExistOwnerName(OwnerDto ownerDto);
         Task<bool> IsExistOwner(OwnerDto ownerDto);
         Task<OwnerDto> CreateOwnerAsync(OwnerForCreationDto ownerDto);

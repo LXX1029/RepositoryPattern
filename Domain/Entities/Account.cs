@@ -9,14 +9,14 @@ namespace Domain.Entities
     [Table("Account")]
     public class Account
     {
+        [Key]
         public Guid AccountId { get; set; }
         [Required(ErrorMessage = "DateCreated 不能为空")]
         public DateTime DateCreated { get; set; } = DateTime.Now;
         [Required(ErrorMessage = "AccountType 不能为空")]
         public string AccountType { get; set; }
 
-        [ForeignKey(nameof(Owner))]
+        [ForeignKey("OwnerId")]
         public Guid OwnerId { get; set; }
-        public Owner Owner { get; set; }
     }
 }

@@ -68,10 +68,10 @@ namespace Services
             return ownerDtos;
         }
 
-        public async Task<OwnerDto> GetOwnerWithDetails(Guid ownerId)
+        public async Task<OwnerWithAccountDto> GetOwnerWithDetails(Guid ownerId)
         {
             var owner = await this._repositoryWrapper.Owner.GetOwnerWithDetailsAsync(ownerId);
-            return owner.Adapt<OwnerDto>();
+            return owner.Adapt<OwnerWithAccountDto>();
         }
 
         public async Task<bool> IsExistOwnerName(OwnerDto ownerDto)

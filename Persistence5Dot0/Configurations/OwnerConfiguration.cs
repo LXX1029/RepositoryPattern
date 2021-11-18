@@ -16,6 +16,10 @@ namespace Persistence5Dot0.Configurations
                 new Owner { OwnerId = Guid.Parse("E8253D32-603A-45C3-8D7B-48B2971B20E5"), Name = "Name3", Address = "湖南", DateOfBirth = DateTime.Parse("1992-03-02") },
                 new Owner { OwnerId = Guid.Parse("54AEB677-A1FC-479F-B095-98476A027E6D"), Name = "Name4", Address = "湖北", DateOfBirth = DateTime.Parse("1991-03-02") }
              );
+            builder.HasMany<Account>(x => x.Accounts)
+                .WithOne()
+                .HasForeignKey(x => x.OwnerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Contracts5Dot0
 
         public string Address { get; set; }
 
-        public ICollection<AccountDto> Accounts { get; set; }
+
     }
     public class OwnerForCreationDto
     {
@@ -41,5 +41,10 @@ namespace Contracts5Dot0
         [Required(ErrorMessage = "Address 不能为空")]
         [StringLength(100, ErrorMessage = "Address长度不能大于60")]
         public string Address { get; set; }
+    }
+
+    public class OwnerWithAccountDto : OwnerDto
+    {
+        public ICollection<AccountDto> Accounts { get; set; }
     }
 }

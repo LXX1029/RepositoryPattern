@@ -64,22 +64,22 @@ namespace Persistence5Dot0.Migrations
             migrationBuilder.InsertData(
                 table: "Account",
                 columns: new[] { "AccountId", "AccountType", "DateCreated", "OwnerId" },
-                values: new object[] { new Guid("d7ddc108-6b05-4a59-b1c2-7a7b5bc8c1cb"), "网易", new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(3446), new Guid("efd9b8e4-b759-434d-bda1-21d268531fb3") });
+                values: new object[] { new Guid("cea2d9ce-d815-44fe-9763-98634bdd1388"), "网易", new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4031), new Guid("efd9b8e4-b759-434d-bda1-21d268531fb3") });
 
             migrationBuilder.InsertData(
                 table: "Account",
                 columns: new[] { "AccountId", "AccountType", "DateCreated", "OwnerId" },
-                values: new object[] { new Guid("92352da2-6f82-4ae3-80b5-596b80d70b91"), "腾讯", new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5785), new Guid("be24d142-c750-4cee-90eb-2b99d942b33c") });
+                values: new object[] { new Guid("4c605048-2faf-4cad-99e2-715201ee8b33"), "腾讯", new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4867), new Guid("efd9b8e4-b759-434d-bda1-21d268531fb3") });
 
             migrationBuilder.InsertData(
                 table: "Account",
                 columns: new[] { "AccountId", "AccountType", "DateCreated", "OwnerId" },
-                values: new object[] { new Guid("89676aed-dcf6-4b99-a3fc-b2c3134945f3"), "京东", new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5848), new Guid("e8253d32-603a-45c3-8d7b-48b2971b20e5") });
+                values: new object[] { new Guid("bdeba495-e02a-416f-a462-126b353ec8b6"), "京东", new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4880), new Guid("e8253d32-603a-45c3-8d7b-48b2971b20e5") });
 
             migrationBuilder.InsertData(
                 table: "Account",
                 columns: new[] { "AccountId", "AccountType", "DateCreated", "OwnerId" },
-                values: new object[] { new Guid("44e257ca-d7a9-426b-a4eb-9d124cf45941"), "CSDN", new DateTime(2021, 11, 17, 13, 39, 43, 431, DateTimeKind.Local).AddTicks(5853), new Guid("54aeb677-a1fc-479f-b095-98476a027e6d") });
+                values: new object[] { new Guid("dbfa3622-8150-4730-b4e9-321cfa4d79c7"), "CSDN", new DateTime(2021, 11, 18, 15, 34, 20, 74, DateTimeKind.Local).AddTicks(4886), new Guid("54aeb677-a1fc-479f-b095-98476a027e6d") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Account_OwnerId",
