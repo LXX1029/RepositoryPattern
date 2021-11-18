@@ -159,7 +159,7 @@ namespace AspNetCore_NlogTest.Controllers
             //    return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = "该owner 下存在 account 信息，请先删除 account!" };
             //}
             await this._serviceManager.OwnerService.DeleteOwnerAsync(ownerDto);
-            return new ResponseDetails { Message = SUCCESS };
+            return ResponseSuccess();
         }
     }
 }
