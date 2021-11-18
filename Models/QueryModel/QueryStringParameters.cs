@@ -10,7 +10,7 @@ namespace Models.QueryModel
         /// <summary>
         /// 当前页码
         /// </summary>
-        public int PageNumber { get; set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
         private int _pageSize = 10;
         /// <summary>

@@ -35,7 +35,7 @@ namespace AspNetCore_NlogTest.Extensions
                         //}.ToString());
                         await context.Response.WriteAsync(new ResponseDetails
                         {
-                            Code = (HttpStatusCode)context.Response.StatusCode,
+                            ResponseCode = ResponseCode.InnterServerError,
                             Message = "Internal Server Error"
                         }.ToString());
                     }

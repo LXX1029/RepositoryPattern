@@ -58,12 +58,13 @@ namespace Services
         public async Task<PagedList<OwnerDto>> GetOwners(OwnerParameters ownerParameters)
         {
             var owners = await this._repositoryWrapper.Owner.GetOwnersAsync(ownerParameters);
-            //var ownerDtos = this._mapper.Map<PagedList<OwnerDto>>(owners);
             var ownerDtos = owners.Adapt<PagedList<OwnerDto>>();
-            ownerDtos.CurrentPage = owners.CurrentPage;
+            ownerDtos.CurrentPageIndex = owners.CurrentPageIndex;
             ownerDtos.TotalCount = owners.TotalCount;
             ownerDtos.TotalPages = owners.TotalPages;
             ownerDtos.PageSize = owners.PageSize;
+            ownerDtos.NextPageIndex = owners.NextPageIndex;
+            ownerDtos.PreviousPageIndex = owners.PreviousPageIndex;
             return ownerDtos;
         }
 

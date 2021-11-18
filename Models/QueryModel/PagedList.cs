@@ -14,7 +14,15 @@ namespace Models.QueryModel
         /// <summary>
         /// 当前页
         /// </summary>
-        public int CurrentPage { get;  set; }
+        public int CurrentPageIndex { get; set; }
+        /// <summary>
+        /// 上一页
+        /// </summary>
+        public int PreviousPageIndex { get; set; }
+        /// <summary>
+        /// 下一页
+        /// </summary>
+        public int NextPageIndex { get; set; }
         /// <summary>
         /// 总页数
         /// </summary>
@@ -30,17 +38,19 @@ namespace Models.QueryModel
         /// <summary>
         /// 是否有上一页
         /// </summary>
-        public bool HasPrevious => CurrentPage > 1;
+        public bool HasPrevious => CurrentPageIndex > 1;
         /// <summary>
         /// 是否有下一页
         /// </summary>
-        public bool HasNext => CurrentPage < TotalPages;
-        public PagedList(List<T> items, int count, int pageNumber, int pageSize):base()
+        public bool HasNext => CurrentPageIndex < TotalPages;
+        public PagedList(List<T> items, int count, int currentPage, int pageSize) : base()
         {
             TotalCount = count;
             PageSize = pageSize;
-            CurrentPage = pageNumber;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+            CurrentPageIndex = currentPage;
+            if (this.HasNext) this.NextPageIndex = this.CurrentPageIndex + 1;
+            if (this.HasPrevious) this.PreviousPageIndex = this.CurrentPageIndex - 1;
             AddRange(items);
         }
         /// <summary>
@@ -53,9 +63,27 @@ namespace Models.QueryModel
         public static PagedList<T> ToPagedList(IQueryable<T> source, int currentPage, int pageSize)
         {
             var count = source.Count();
+            var totalPages = (int)Math.Ceiling(count / (double)pageSize);
+            if (currentPage == 0)
+                currentPage = 1;
+            currentPage = currentPage > 0 ? currentPage > totalPages ? 1 : currentPage : 1;
             var items = source.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
 
             return new PagedList<T>(items, count, currentPage, pageSize);
+        }
+        public object GetPagination()
+        {
+            return new
+            {
+                this.TotalCount,
+                this.PageSize,
+                this.CurrentPageIndex,
+                this.NextPageIndex,
+                this.PreviousPageIndex,
+                this.TotalPages,
+                this.HasNext,
+                this.HasPrevious
+            };
         }
     }
 }

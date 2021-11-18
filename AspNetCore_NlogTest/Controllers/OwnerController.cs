@@ -34,56 +34,27 @@ namespace AspNetCore_NlogTest.Controllers
         {
             var owners = await this._serviceManager.OwnerService.GetOwners(new Models.QueryModel.OwnerParameters());
             this._loggerManager.LogInfo("返回所有 Owner数据");
-            var pagination = new
-            {
-                owners.TotalCount,
-                owners.PageSize,
-                owners.CurrentPage,
-                owners.TotalPages,
-                owners.HasNext,
-                owners.HasPrevious
-            };
+            var pagination = owners.GetPagination();
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pagination));
-            return new ResponseDetails
-            {
-                Message = SUCCESS,
-                Data = owners,
-                Pagination = pagination
-            };
+            return ResponseSuccessWithData(owners, pagination);
         }
 
         [HttpGet]
         public async Task<ResponseDetails> GetOwners([FromBody] OwnerParameters ownerParameters)
         {
             if (ownerParameters == null)
-                return new ResponseDetails
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = PARAM_NULL_ERROR
-                };
+                return ResponseParamIsNull();
 
             // 参数判断在前端或者后端返回
             if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
             {
-                return new ResponseDetails
-                {
-                    Code = HttpStatusCode.BadRequest,
-                    Message = INNTER_SERVER_ERROR
-                };
+                return ResponseInnterServerError();
             }
             var owners = await this._serviceManager.OwnerService.GetOwners(ownerParameters);
             this._loggerManager.LogInfo("分页返回 Owner数据");
-            var pagination = new
-            {
-                owners.TotalCount,
-                owners.PageSize,
-                owners.CurrentPage,
-                owners.TotalPages,
-                owners.HasNext,
-                owners.HasPrevious
-            };
+            var pagination = owners.GetPagination();
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(pagination));
-            return new ResponseDetails { Code = HttpStatusCode.OK, Data = owners, Pagination = pagination };
+            return ResponseSuccessWithData(owners, pagination);
         }
 
         [HttpGet]
@@ -92,11 +63,11 @@ namespace AspNetCore_NlogTest.Controllers
             var owner = await this._serviceManager.OwnerService.GetOwnerById(ownerId);
             if (owner == null)
             {
-                return new ResponseDetails { Code = HttpStatusCode.NotFound, Message = NOT_FOND };
+                return ResponseNotFound();
             }
             else
             {
-                return new ResponseDetails { Data = owner, Message = SUCCESS };
+                return ResponseSuccessWithData(owner);
             }
         }
         [HttpGet("{ownerId}")]
@@ -105,11 +76,11 @@ namespace AspNetCore_NlogTest.Controllers
             var owner = await this._serviceManager.OwnerService.GetOwnerWithDetails(ownerId);
             if (owner == null)
             {
-                return new ResponseDetails { Code = HttpStatusCode.NotFound, Message = NOT_FOND };
+                return ResponseNotFound();
             }
             else
             {
-                return new ResponseDetails { Data = owner, Message = SUCCESS };
+                return ResponseSuccessWithData(owner);
             }
         }
 
@@ -119,22 +90,22 @@ namespace AspNetCore_NlogTest.Controllers
             if (ownerForCreationDto == null)
             {
                 _loggerManager.LogError("参数为空");
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
+                return ResponseParamIsNull();
             }
             if (!ModelState.IsValid)
             {
                 this._loggerManager.LogError("参数格式不正确");
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
+                return ResponseParamFormatError();
             }
             var owner = ownerForCreationDto.Adapt<OwnerDto>();
             var _isExist = await this._serviceManager.OwnerService.IsExistOwnerName(owner);
             if (_isExist)
             {
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = $"该owner名称[{owner.Name}]已存在" };
+                return ResponseIsAlreadyExist($"该owner名称[{owner.Name}]已存在");
             }
             owner = await this._serviceManager.OwnerService.CreateOwnerAsync(ownerForCreationDto);
 
-            return new ResponseDetails { Code = HttpStatusCode.Created, Data = owner };
+            return ResponseSuccessWithData(owner);
         }
 
 
@@ -144,12 +115,12 @@ namespace AspNetCore_NlogTest.Controllers
             if (ownerForUpdate == null)
             {
                 _loggerManager.LogError("参数为空");
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
+                return ResponseParamIsNull();
             }
             if (!ModelState.IsValid)
             {
                 this._loggerManager.LogError("参数格式不正确");
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
+                return ResponseParamFormatError();
             }
             var ownerEntity = ownerForUpdate.Adapt<OwnerDto>();
 
@@ -157,60 +128,38 @@ namespace AspNetCore_NlogTest.Controllers
             if (!isExistOwner)
             {
                 this._loggerManager.LogDebug($"不存在Id为：{ownerForUpdate.OwnerId}的对象");
-                return new ResponseDetails { Code = HttpStatusCode.NotFound, Message = $"不存在Id为：{ownerForUpdate.OwnerId}的对象" };
+                return ResponseNotFound($"不存在Id为：{ownerForUpdate.OwnerId}的对象");
             }
             var _isExist = await this._serviceManager.OwnerService.IsExistOwnerName(ownerEntity);
             if (_isExist)
             {
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = "该名称已存在" };
+                return ResponseIsAlreadyExist("该名称已存在");
             }
 
             // var ownerEntity = ownerForUpdate.Adapt<OwnerDto>();
             var updateOwner = await this._serviceManager.OwnerService.UpdateOwnerAsync(ownerEntity);
-            return new ResponseDetails { Data = ownerEntity, Message = SUCCESS };
-
-
+            return ResponseSuccessWithData(ownerEntity);
         }
         [HttpDelete]
-        public async Task<ResponseDetails> DeleteOwner(Guid id)
+        public async Task<ResponseDetails> DeleteOwner([FromBody] OwnerDto ownerDto)
         {
-            if (!Guid.TryParse(id.ToString(), out Guid result))
+            if (ownerDto == null)
             {
                 _loggerManager.LogError("传入参数不合法");
-                return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = PARAM_FORMAT_ERROR };
+                return ResponseParamFormatError();
             }
-            var owner = await this._serviceManager.OwnerService.GetOwnerById(id);
-            if (owner == null)
+            var isExistOwner = await this._serviceManager.OwnerService.IsExistOwner(ownerDto);
+            if (!isExistOwner)
             {
-                return new ResponseDetails { Code = HttpStatusCode.NotFound, Message = $"不存在Id为：{owner.OwnerId}的对象" };
+                return ResponseNotFound($"不存在Id为：{ownerDto.OwnerId}的数据");
             }
             //if (this._serviceManager.OwnerService.AccountsByOwner(id).Any())
             //{
             //    _loggerManager.LogError("该owner 下存在 account 信息，请先删除 account!");
             //    return new ResponseDetails { Code = HttpStatusCode.BadRequest, Message = "该owner 下存在 account 信息，请先删除 account!" };
             //}
-            await this._serviceManager.OwnerService.DeleteOwnerAsync(owner);
+            await this._serviceManager.OwnerService.DeleteOwnerAsync(ownerDto);
             return new ResponseDetails { Message = SUCCESS };
-
-        }
-        [HttpPost]
-        public async Task<ResponseDetails> UploadFile(IFormFile file)
-        {
-            try
-            {
-                if (file == null) return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
-                var uploadResult = await this._repositoryWrapper.Owner.UpLoadFile(file);
-                if (uploadResult)
-                    return new ResponseDetails { Code = (int)HttpStatusCode.OK, Message = SUCCESS };
-                else
-                    return new ResponseDetails { Code = (int)HttpStatusCode.InternalServerError, Message = FAIL };
-            }
-            catch (Exception ex)
-            {
-                _loggerManager.LogError(ex);
-                return new ResponseDetails { Code = (int)HttpStatusCode.InternalServerError, Message = INNTER_SERVER_ERROR };
-            }
-
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Text;
 
@@ -11,10 +12,23 @@ namespace Models
     /// </summary>
     public class ResponseDetails
     {
+        public ResponseDetails()
+        {
+
+        }
+        public ResponseDetails(ResponseCode responseCode, string message = "", object data = null, object pagination = null)
+        {
+            this.ResponseCode = responseCode;
+            this.Message = message;
+            this.Data = data;
+            this.Pagination = pagination;
+        }
         /// <summary>
         /// 响应状态码
         /// </summary>
-        public HttpStatusCode Code { get; set; } = HttpStatusCode.OK;
+        //public HttpStatusCode Code { get; set; } = HttpStatusCode.OK;
+        public ResponseCode ResponseCode { get; set; } = ResponseCode.Success;
+
         private string message;
         /// <summary>
         /// 响应消息文本
@@ -105,6 +119,30 @@ namespace Models
         public object Pagination { get; set; }
 
         public override string ToString() => JsonConvert.SerializeObject(this);
-
+    }
+    /*
+          protected readonly string SUCCESS = "操作成功";
+        protected readonly string NOT_FOND = "未查询到对象";
+        protected readonly string INNTER_SERVER_ERROR = "服务内部错误";
+        protected readonly string PARAM_NULL_ERROR = "参数为空";
+        protected readonly string PARAM_FORMAT_ERROR = "参数为空";
+     */
+    /// <summary>
+    /// 操作结果标识
+    /// </summary>
+    public enum ResponseCode
+    {
+        [Description("操作成功")]
+        Success,
+        [Description("数据未找到")]
+        NotFound,
+        [Description("数据已存在")]
+        IsAlreadyExist,
+        [Description("服务器内部错误")]
+        InnterServerError,
+        [Description("参数为空")]
+        ParamIsNull,
+        [Description("参数格式错误")]
+        ParamFormatError,
     }
 }

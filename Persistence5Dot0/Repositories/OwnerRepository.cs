@@ -27,7 +27,7 @@ namespace Persistence5Dot0.Repositories
 
         public Task<PagedList<Owner>> GetOwnersAsync(OwnerParameters ownerParameters)
         {
-            return Task.FromResult(PagedList<Owner>.ToPagedList(FindAll(), ownerParameters.PageNumber, ownerParameters.PageSize));
+            return Task.FromResult(PagedList<Owner>.ToPagedList(FindAll(), ownerParameters.CurrentPage, ownerParameters.PageSize));
         }
 
         public async Task<Owner> GetOwnerWithDetailsAsync(Guid ownerId)
