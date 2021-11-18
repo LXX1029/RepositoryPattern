@@ -193,5 +193,24 @@ namespace AspNetCore_NlogTest.Controllers
             return new ResponseDetails { Message = SUCCESS };
 
         }
+        [HttpPost]
+        public async Task<ResponseDetails> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null) return new ResponseDetails { Code = (int)HttpStatusCode.BadRequest, Message = PARAM_NULL_ERROR };
+                var uploadResult = await this._repositoryWrapper.Owner.UpLoadFile(file);
+                if (uploadResult)
+                    return new ResponseDetails { Code = (int)HttpStatusCode.OK, Message = SUCCESS };
+                else
+                    return new ResponseDetails { Code = (int)HttpStatusCode.InternalServerError, Message = FAIL };
+            }
+            catch (Exception ex)
+            {
+                _loggerManager.LogError(ex);
+                return new ResponseDetails { Code = (int)HttpStatusCode.InternalServerError, Message = INNTER_SERVER_ERROR };
+            }
+
+        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -85,6 +87,22 @@ namespace Repository
 
             return PagedList<Owner>.ToPagedList(owners.OrderBy(m => m.Name).AsQueryable(),
                 ownerParameters.PageNumber, ownerParameters.PageSize);
+        }
+
+        public async Task<bool> UpLoadFile(IFormFile file)
+        {
+
+            var fileName = string.Empty;
+            var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+            fileName = DateTime.Now.Ticks + extension;
+            var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+            if (!Directory.Exists(pathBuilt))
+                Directory.CreateDirectory(pathBuilt);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+               fileName);
+            using var stream = new FileStream(path, FileMode.Create);
+            await file.CopyToAsync(stream);
+            return true;
         }
     }
 }

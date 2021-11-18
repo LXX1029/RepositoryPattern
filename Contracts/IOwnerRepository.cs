@@ -5,6 +5,7 @@ using System.Text;
 using System.Linq;
 using Entities;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Contracts
 {
@@ -18,5 +19,6 @@ namespace Contracts
         void CreateOwner(Owner owner);
         void UpdateOwner(Owner owner);
         void DeleteOwner(Owner owner);
+        Task<bool> UpLoadFile(IFormFile file);
     }
 }
