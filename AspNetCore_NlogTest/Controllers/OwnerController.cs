@@ -46,10 +46,11 @@ namespace AspNetCore_NlogTest.Controllers
                 return ResponseParamIsNull();
 
             // 参数判断在前端或者后端返回
-            if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
-            {
-                return ResponseInnterServerError();
-            }
+            //if (ownerParameters.MinYearOfBirth != null && ownerParameters.MaxYearOfBirth != null && !ownerParameters.ValidYearRang)
+            //{
+            //    return ResponseInnterServerError();
+            //}
+
             var owners = await this._serviceManager.OwnerService.GetOwners(ownerParameters);
             this._loggerManager.LogInfo("分页返回 Owner数据");
             var pagination = owners.GetPagination();

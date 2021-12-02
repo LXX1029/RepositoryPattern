@@ -1,12 +1,9 @@
 ﻿using Domain.Entities;
 using Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
-using Models.QueryModel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Persistence5Dot0.Repositories
@@ -25,9 +22,13 @@ namespace Persistence5Dot0.Repositories
             return await this._dbContext.Owners.SingleOrDefaultAsync(x => x.OwnerId.Equals(ownerId));
         }
 
-        public Task<PagedList<Owner>> GetOwnersAsync(OwnerParameters ownerParameters)
+        public Task<IQueryable<Owner>> GetOwnersAsync()
         {
-            return Task.FromResult(PagedList<Owner>.ToPagedList(FindAll(), ownerParameters.CurrentPage, ownerParameters.PageSize));
+            return Task.FromResult(FindAll());
+        }
+        public Task<IQueryable<Owner>> GetOwnersByConditiionAsync(Expression<Func<Owner, bool>> expression)
+        {
+            return Task.FromResult(FindByCondition(expression));
         }
 
         public async Task<Owner> GetOwnerWithDetailsAsync(Guid ownerId)

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Services
 {
+    /// <summary>
+    /// 服务管理类
+    /// </summary>
     public sealed class ServiceManager : IServiceManager
     {
 

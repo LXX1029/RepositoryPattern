@@ -8,6 +8,7 @@ using Services.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,14 +58,23 @@ namespace Services
 
         public async Task<PagedList<OwnerDto>> GetOwners(OwnerParameters ownerParameters)
         {
-            var owners = await this._repositoryWrapper.Owner.GetOwnersAsync(ownerParameters);
-            var ownerDtos = owners.Adapt<PagedList<OwnerDto>>();
-            ownerDtos.CurrentPageIndex = owners.CurrentPageIndex;
-            ownerDtos.TotalCount = owners.TotalCount;
-            ownerDtos.TotalPages = owners.TotalPages;
-            ownerDtos.PageSize = owners.PageSize;
-            ownerDtos.NextPageIndex = owners.NextPageIndex;
-            ownerDtos.PreviousPageIndex = owners.PreviousPageIndex;
+            //if (!string.IsNullOrEmpty(ownerParameters.Name))
+            //    owners = owners.Where(x => x.Name.Contains(ownerParameters.Name));
+            Expression<Func<Owner, bool>> expression = (x) => true;
+            if (!string.IsNullOrEmpty(ownerParameters.Name))
+                expression = (x) => x.Name.Contains(ownerParameters.Name);
+            var str = expression.Body.ToString();
+
+            var owners = await this._repositoryWrapper.Owner.GetOwnersByConditiionAsync(expression);
+
+            var ownerPageList = PagedList<Owner>.ToPagedList(owners, ownerParameters.CurrentPage, ownerParameters.PageSize);
+            var ownerDtos = ownerPageList.Adapt<PagedList<OwnerDto>>();
+            ownerDtos.CurrentPageIndex = ownerPageList.CurrentPageIndex;
+            ownerDtos.TotalCount = ownerPageList.TotalCount;
+            ownerDtos.TotalPages = ownerPageList.TotalPages;
+            ownerDtos.PageSize = ownerPageList.PageSize;
+            ownerDtos.NextPageIndex = ownerPageList.NextPageIndex;
+            ownerDtos.PreviousPageIndex = ownerPageList.PreviousPageIndex;
             return ownerDtos;
         }
 

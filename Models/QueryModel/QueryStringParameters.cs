@@ -4,8 +4,14 @@ using System.Text;
 
 namespace Models.QueryModel
 {
+    /// <summary>
+    /// 查询条件基类
+    /// </summary>
     public abstract class QueryStringParameters
     {
+        /// <summary>
+        /// 每页最大显示条目数
+        /// </summary>
         const int maxPageSize = 50;
         /// <summary>
         /// 当前页码

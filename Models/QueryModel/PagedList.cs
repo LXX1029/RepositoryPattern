@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Models.QueryModel
 {
+    /// <summary>
+    /// 分页类
+    /// </summary>
+    /// <typeparam name="T">数据对象</typeparam>
     public class PagedList<T> : List<T>
     {
         public PagedList()
@@ -71,6 +75,10 @@ namespace Models.QueryModel
 
             return new PagedList<T>(items, count, currentPage, pageSize);
         }
+        /// <summary>
+        /// 返回分页信息
+        /// </summary>
+        /// <returns>分页信息对象</returns>
         public object GetPagination()
         {
             return new

@@ -27,7 +27,7 @@ namespace AspNetCore_NlogTest.Extensions
             services.AddSingleton<ILoggerManager, LoggerManager>();
             services.AddLogging(options =>
             {
-                options.AddDebug();
+                //options.AddDebug();
                 options.AddNLog();
             });
         }
@@ -56,10 +56,11 @@ namespace AspNetCore_NlogTest.Extensions
         {
             var connectionString = configuration.GetConnectionString("sqliteConnection");
             services.AddDbContextPool<RepositoryContext>(options =>
-            options.UseSqlite(connectionString, options =>
+            options.EnableSensitiveDataLogging()
+            .UseSqlite(connectionString, options =>
             {
                 options.MigrationsAssembly("Persistence5Dot0");
-            }));
+            })); ;
         }
 
 

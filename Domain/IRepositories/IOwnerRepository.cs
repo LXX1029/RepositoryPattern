@@ -1,14 +1,15 @@
 ﻿using Domain.Entities;
-using Models.QueryModel;
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Domain.IRepositories
 {
     public interface IOwnerRepository : IRepositoryBase<Owner>
     {
-        Task<PagedList<Owner>> GetOwnersAsync(OwnerParameters ownerParameters);
+        Task<IQueryable<Owner>> GetOwnersAsync();
+        Task<IQueryable<Owner>> GetOwnersByConditiionAsync(Expression<Func<Owner, bool>> expression);
         Task<Owner> GetOwnerByIdAsync(Guid ownerId);
         Task<Owner> GetOwnerWithDetailsAsync(Guid ownerId);
         Task<bool> IsExistOwnerName(Owner owner);
