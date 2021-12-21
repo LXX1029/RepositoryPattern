@@ -60,7 +60,7 @@ namespace AspNetCore_NlogTest.Extensions
             .UseSqlite(connectionString, options =>
             {
                 options.MigrationsAssembly("Persistence5Dot0");
-            })); ;
+            }));
         }
 
 

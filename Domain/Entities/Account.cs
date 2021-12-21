@@ -18,5 +18,8 @@ namespace Domain.Entities
 
         [ForeignKey("OwnerId")]
         public Guid OwnerId { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime LastUpdatedTime { get; set; }
+
     }
 }

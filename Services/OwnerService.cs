@@ -63,6 +63,7 @@ namespace Services
             Expression<Func<Owner, bool>> expression = (x) => true;
             if (!string.IsNullOrEmpty(ownerParameters.Name))
                 expression = (x) => x.Name.Contains(ownerParameters.Name);
+
             var str = expression.Body.ToString();
 
             var owners = await this._repositoryWrapper.Owner.GetOwnersByConditiionAsync(expression);

@@ -9,6 +9,8 @@ namespace Persistence5Dot0.Configurations
     {
         public void Configure(EntityTypeBuilder<Owner> builder)
         {
+            //builder.Property(x=>x.Name).IsRequired().HasMaxLength(200).ValueGeneratedOnAdd();
+
             // 配置Owner类属性
             builder.HasData(
                 new Owner { OwnerId = Guid.Parse("EFD9B8E4-B759-434D-BDA1-21D268531FB3"), Name = "Name1", Address = "河南", DateOfBirth = DateTime.Parse("1999-03-02") },
