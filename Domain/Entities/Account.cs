@@ -17,7 +17,7 @@ namespace Domain.Entities
         public string AccountType { get; set; }
 
         [ForeignKey("OwnerId")]
-        public Guid OwnerId { get; set; }
+        public Guid OwnerId { get; set; }  // 完全关系定义，只包含主实体Id；
         public DateTime CreatedTime { get; set; }
         public DateTime LastUpdatedTime { get; set; }
 

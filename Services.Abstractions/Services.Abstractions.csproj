@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="IWindowsApiService.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts5.0\Contracts5Dot0.csproj" />

@@ -19,7 +19,7 @@ namespace Persistence5Dot0.Repositories
 
         public async Task<Owner> GetOwnerByIdAsync(Guid ownerId)
         {
-            return await this._dbContext.Owners.SingleOrDefaultAsync(x => x.OwnerId.Equals(ownerId));
+            return await FindByCondition(x => x.OwnerId.Equals(ownerId)).FirstOrDefaultAsync();
         }
 
         public Task<IQueryable<Owner>> GetOwnersAsync()
@@ -33,7 +33,10 @@ namespace Persistence5Dot0.Repositories
 
         public async Task<Owner> GetOwnerWithDetailsAsync(Guid ownerId)
         {
-            return await this._dbContext.Owners.Include(x => x.Accounts).FirstOrDefaultAsync(x => x.OwnerId.Equals(ownerId));
+            //return await this._dbContext.Owners.Include(x => x.Accounts).FirstOrDefaultAsync(x => x.OwnerId.Equals(ownerId));
+            return await FindByCondition(owner => owner.OwnerId.Equals(ownerId))
+                .Include(x => x.Accounts)
+                .FirstOrDefaultAsync();
         }
 
 

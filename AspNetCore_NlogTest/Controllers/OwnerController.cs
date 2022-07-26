@@ -29,6 +29,12 @@ namespace AspNetCore_NlogTest.Controllers
             this._serviceManager = serviceManager;
             this._mapper = mapper;
         }
+
+        public void GetError()
+        {
+            throw new Exception("error");
+        }
+
         [HttpGet]
         public async Task<ResponseDetails> GetAllOwners()
         {

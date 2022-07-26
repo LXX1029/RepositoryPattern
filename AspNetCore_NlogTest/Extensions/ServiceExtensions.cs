@@ -24,10 +24,13 @@ namespace AspNetCore_NlogTest.Extensions
         /// <param name="services">服务集合</param>
         public static void ConfigureLoggerService(this IServiceCollection services)
         {
+            // 添加自定义服务
             services.AddSingleton<ILoggerManager, LoggerManager>();
+            // 添加NLog服务
             services.AddLogging(options =>
             {
                 //options.AddDebug();
+                options.ClearProviders();
                 options.AddNLog();
             });
         }

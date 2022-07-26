@@ -47,7 +47,7 @@ namespace AspNetCore_NlogTest.Extensions
         /// 自定义异常处理中间件
         /// </summary>
         /// <param name="app">IApplicationBuilder</param>
-        public static void ConfigureCustomExceptionMiddleware(this IApplicationBuilder app)
+        public static void UseCustomExceptionMiddleware(this IApplicationBuilder app)
         {
             app.UseMiddleware<ExceptionHandleMiddleware>();
         }

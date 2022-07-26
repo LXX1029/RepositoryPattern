@@ -12,6 +12,7 @@ namespace AspNetCore_NlogTest
     public class LoggerManager : ILoggerManager
     {
         private static ILogger _logger = LogManager.GetCurrentClassLogger();
+
         public void LogDebug(string message)
         {
             _logger.Debug(message);
@@ -26,8 +27,14 @@ namespace AspNetCore_NlogTest
         {
             var builder = new StringBuilder();
             builder.AppendLine($"Message:{exception.Message}");
-            builder.AppendLine($"StackTrace:{exception.Message}");
-            _logger.Error(exception);
+            builder.AppendLine($"StackTrace".PadRight(100, '='));
+            builder.AppendLine($"{exception.StackTrace}");
+            builder.AppendLine($"StackTrace".PadRight(100, '='));
+            if (exception.InnerException != null)
+            {
+                builder.AppendLine($"InnerException:{exception.InnerException.Message}");
+            }
+            _logger.Error(builder.ToString());
 
         }
 

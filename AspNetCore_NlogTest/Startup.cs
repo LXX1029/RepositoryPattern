@@ -53,7 +53,7 @@ namespace AspNetCore_NlogTest
 
             //app.ConfigureExceptionHandler(logger);
             // 使用自定义中间件
-           app.ConfigureCustomExceptionMiddleware();
+           app.UseCustomExceptionMiddleware();
             app.UseStaticFiles();
             //app.UseStaticFiles(new StaticFileOptions
             //{
