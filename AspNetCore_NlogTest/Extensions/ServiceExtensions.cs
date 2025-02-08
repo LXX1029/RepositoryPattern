@@ -91,6 +91,7 @@ namespace AspNetCore_NlogTest.Extensions
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
         {
             services.AddScoped<IServiceManager, ServiceManager>();
+
             services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
         }
 
